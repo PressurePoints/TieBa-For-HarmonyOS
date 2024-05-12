@@ -7,12 +7,39 @@ import Send from '../view/Send';
 import Skimbar from '../view/Skimbar';
 import Setting from '../view/Setting'
 
+import Prompt from '@system.prompt';
+
+@Extend(TextInput)
+function inputStyle() {
+  .placeholderColor($r('app.color.placeholder_color'))
+  .height($r('app.float.login_input_height'))
+  .fontSize($r('app.float.big_text_size'))
+  .backgroundColor($r('app.color.background'))
+  .width('100%')
+  .padding({ left: 0 })
+  .margin({ top: $r('app.float.input_margin_top') })
+}
+
+@Extend(Line)
+function lineStyle() {
+  .width('100%')
+  .height($r('app.float.line_height'))
+  .backgroundColor($r('app.color.line_color'))
+}
+
 @Entry
 @Component
 struct MainPage {
+  // @State posts:any = this.getPosts();
+  // @Provide posts:any = this.getPosts();
+  @State post_increase:number = 0;
+
   @State username:string = router.getParams()['username'];
   @State password:string = router.getParams()['password'];
   @State permission:string = router.getParams()['permission'];
+
+  @State title:string='';
+  @State essay:string='';
 
   @State currentIndex: number = 0;
   @State currentIndex1: number = 0;
@@ -40,6 +67,37 @@ struct MainPage {
     })
   }
 
+  Send(): void {
+    if (this.title === '' || this.essay === '') {
+      Prompt.showToast({
+        message: '标题或文章不能为空'
+      })
+    } else {//发送信息
+      console.log(this.title);
+      console.log(this.essay);
+      axios({
+        method: "post",
+        url: 'http://localhost:3000/post/publish',
+        data:{
+          username:this.username,
+          title:this.title,
+          content:this.essay
+        },
+      }).then(res => {
+        // this.posts = this.getPosts();
+        this.post_increase++;
+        Prompt.showToast({
+          message:'发送成功'
+        })
+      }).catch(error => {
+        console.error(error);
+        Prompt.showToast({
+          message:'发送失败'
+        })
+      })
+    }
+  }
+
   build() {
     Tabs({
       barPosition: BarPosition.End,
@@ -55,6 +113,10 @@ struct MainPage {
 
       TabContent() {
         Skimbar()
+        // Button("查看", { type: ButtonType.Capsule }).width("100%")
+        //   .onClick(() => {
+        //     console.info('POSTS::' + JSON.stringify(this.posts))
+        //   })
       }
       .padding({ left: $r('app.float.mainPage_padding'), right: $r('app.float.mainPage_padding') })
       .backgroundColor(Color.White)
@@ -62,7 +124,40 @@ struct MainPage {
         $r('app.media.Skimbar_selected'), $r('app.media.Skimbar'),false))
 
       TabContent() {
-        Send()
+        Column({ space: 12 }) {
+          TextInput({ placeholder: "请输入完整的帖子标题" })
+            .maxLength(11)
+            .inputStyle()
+            .onChange((value: string) => {
+              this.title = value;
+            })
+          Line().lineStyle()
+          TextArea({ placeholder: "请输入正文" })
+            .placeholderFont({ size: 16, weight: 400 })
+            .width("100%")
+            .height(200)
+            .margin(5)
+            .fontSize(16)
+            .fontColor('#182431')
+            .backgroundColor('#FFFFFF')
+            .onChange((value: string) => {
+              this.essay = value;
+            })
+          Line().lineStyle()
+          Button('发送')
+            .backgroundColor('#007DFF')
+            .margin(15)
+            .onClick(() => {
+              this.Send()
+            })
+        }
+          .width("100%")
+          .height("100%")
+          .padding({
+            left:"10vp",
+            right:"10vp",
+            top:"80vp"
+          })
       }
       .padding({ left: $r('app.float.mainPage_padding'), right: $r('app.float.mainPage_padding') })
       .backgroundColor(Color.White)

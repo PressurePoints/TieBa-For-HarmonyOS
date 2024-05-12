@@ -1,5 +1,6 @@
-
 import Prompt from '@system.prompt';
+import  axios  from '@ohos/axios'
+
 @Extend(TextInput)
 function inputStyle() {
   .placeholderColor($r('app.color.placeholder_color'))
@@ -24,11 +25,15 @@ function blueTextStyle() {
   .fontSize($r('app.float.small_text_size'))
   .fontWeight(FontWeight.Medium)
 }
-@Entry
+
+
 @Component
 export  default  struct  Send{
-  @State title:String='';
-  @State essay:String='';
+  @Prop username:string;
+  @Prop password:string;
+
+  @State title:string='';
+  @State essay:string='';
 
   Send(): void {
     if (this.title === '' || this.essay === '') {
@@ -36,52 +41,63 @@ export  default  struct  Send{
         message: '标题或文章不能为空'
       })
     } else {//发送信息
-      Prompt.showToast({
-        message:'发送成功'
+      console.log(this.title);
+      console.log(this.essay);
+      axios({
+        method: "post",
+        url: 'http://localhost:3000/post/publish',
+        data:{
+          username:this.username,
+          title:this.title,
+          content:this.essay
+        },
+      }).then(res => {
+        Prompt.showToast({
+          message:'发送成功'
+        })
+      }).catch(error => {
+        console.error(error);
+        Prompt.showToast({
+          message:'发送失败'
+        })
       })
     }
   }
 
   build() {
-    Scroll() {
-      Column({ space: 12 }) {
-
-
-        TextInput({ placeholder: "请输入完整的帖子标题(5-31个字)" })
-          .maxLength(11)
-          .inputStyle()
-          .onChange((value: string) => {
-            this.title = value;
-          })
-        Line().lineStyle()
-
-        TextArea({ placeholder: "请输入正文" })
-          .placeholderFont({ size: 16, weight: 400 })
-          .width(336)
-          .height(56)
-          .margin(20)
-          .fontSize(16)
-          .fontColor('#182431')
-          .backgroundColor('#FFFFFF')
-          .onChange((value: string) => {
-            this.essay = value;
-          })
-        Line().lineStyle()
-
-        Button('发送')
-          .backgroundColor('#007DFF')
-          .margin(15)
-          .onClick(() => {
-            this.Send()
-          })
-
-
-
-
-
-
-      }
+    Column({ space: 12 }) {
+      TextInput({ placeholder: "请输入完整的帖子标题" })
+        .maxLength(11)
+        .inputStyle()
+        .onChange((value: string) => {
+          this.title = value;
+        })
+      Line().lineStyle()
+      TextArea({ placeholder: "请输入正文" })
+        .placeholderFont({ size: 16, weight: 400 })
+        .width("100%")
+        .height(200)
+        .margin(5)
+        .fontSize(16)
+        .fontColor('#182431')
+        .backgroundColor('#FFFFFF')
+        .onChange((value: string) => {
+          this.essay = value;
+        })
+      Line().lineStyle()
+      Button('发送')
+        .backgroundColor('#007DFF')
+        .margin(15)
+        .onClick(() => {
+          this.Send()
+        })
     }
-    .height('100%')
+      .width("100%")
+      .height("100%")
+      .padding({
+        left:"10vp",
+        right:"10vp",
+        top:"80vp"
+      })
   }
 }
