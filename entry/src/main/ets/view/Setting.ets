@@ -26,7 +26,14 @@ export default struct  Setting{
       .width(20)
       .height($r('app.float.setting_jump_height'))
       .onClick(()=>{
-        router.pushUrl({ url: 'view/Userdata' });
+        router.pushUrl({
+          url: 'view/Userdata',
+          params:{
+            username:this.username,
+            password:this.password,
+            permission:this.permission
+          }
+        });
       })
     }
     .justifyContent(FlexAlign.SpaceBetween)

@@ -146,7 +146,7 @@ struct LoginPage {
           }).catch(error => {
             console.error(error);
             promptAction.showToast({
-              message: '注册失败',
+              message: '用户名已存在',
               duration: 2000,
               bottom: 90
             });
