@@ -1,6 +1,8 @@
 {
   "src": [
     "pages/Index",
-    "pages/MainPage"
+    "pages/MainPage",
+    "view/Userdata",
+    "view/pass_modified"
   ]
 }

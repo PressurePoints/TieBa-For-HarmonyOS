@@ -89,7 +89,7 @@ struct LoginPage {
             url: 'http://localhost:3000/find/'+this.username+ '/' + this.password,
           }).then(res => {
               console.info('result:' + JSON.stringify(res.data));
-              router.pushUrl({
+              router.replaceUrl({
                 url: 'pages/MainPage',
                 params:{
                   username:this.username,
